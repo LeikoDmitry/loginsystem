@@ -37,7 +37,8 @@ class Db {
    /**
     * метод для запроса к базе данных
     */ 
-   public function query($sql,$params = []){
+   public function query($sql,$params = array()){
+     
        $this->error = FALSE;
        if($this->query = $this->pdo->prepare($sql)){
        
@@ -50,6 +51,21 @@ class Db {
           }
        }
        return $this;
+   }
+   public function queryUser($sql,$params = array()){
+      
+       $this->error = FALSE;
+       if($this->query = $this->pdo->prepare($sql)){
+          
+           if($this->query->execute($params)){
+              $this->result = $this->query->fetchAll(PDO::FETCH_OBJ);
+              $this->count = $this->query->rowCount();
+            }
+          else{
+              $this->error = true;
+          }
+       }
+       return $this->result;
    }
    /**
     * Метод  возвращает строку sql-запроса вида SELECT * FROM uuser
@@ -71,21 +87,40 @@ class Db {
                   return $this;
               }
           }
+          
        }
-       return false;
+       
+      return false; 
    }
    
    public function get($table,$where){
        return $this->actions("SELECT *",$table,$where);
    }
-   
+   public function getU($table, $dat=[]){
+       if(count($dat) === 3){
+          $operators = ['=','<','>','>=','<='];
+          $field = $dat[0];
+          $operator = $dat[1];
+          $value[] = $dat[2];
+          
+          if(in_array($operator, $operators)){
+               $sql = "SELECT * FROM {$table} WHERE $field $operator ?";
+               
+               return $this->queryUser($sql,$value);  
+          
+       }
+     }
+   }
    public function delete($table,$where){
-        return $this->actions("DELETE ",$table,$where);
+        return $this->actions("DELETE *",$table,$where);
    }
    
+   
    public function insert($table,$fields = array()){
-         $keys = array_keys($fields);
-         $values = '';
+        
+       $keys = array_keys($fields);
+       
+       $values = '';
          $x = 1;
          foreach ($fields as $field[]){
              $values .= "?";
@@ -95,8 +130,10 @@ class Db {
              $x++;
              
          }
-          $sql = "INSERT INTO users(".  implode(',',$keys).") VALUES({$values})";
-          if(!$this->query($sql,$field)->error()){
+          
+         $sql = "INSERT INTO $table(".'`'.implode('`,`',$keys).'`'.") VALUES({$values})";
+          
+         if(!$this->queryUser($sql,$field)){
             return true;  
           }
       
@@ -125,6 +162,10 @@ class Db {
    public function result(){
        return $this->result;
    }
+   
+   public function first(){
+       return $this->result()[0];
+   }
 
 
    public function error(){
@@ -134,6 +175,8 @@ class Db {
    public function count(){
        return $this->count;
    }
+   
+   
    
    
 }

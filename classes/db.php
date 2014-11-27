@@ -112,7 +112,7 @@ class Db {
      }
    }
    public function delete($table,$where){
-        return $this->actions("DELETE *",$table,$where);
+        return print_r($this->actions("DELETE * ",$table,$where));
    }
    
    
@@ -133,7 +133,7 @@ class Db {
           
          $sql = "INSERT INTO $table(".'`'.implode('`,`',$keys).'`'.") VALUES({$values})";
           
-         if(!$this->queryUser($sql,$field)){
+         if($this->queryUser($sql,$field)){
             return true;  
           }
       

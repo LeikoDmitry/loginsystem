@@ -19,9 +19,13 @@ if($user->isLogin()){
     
 <ul>
     <li><a href="logout.php">Выйти</a></li>
+    <li><a href="update.php">Обновить данные</a></li>
+    <li><a href="changepassword.php">Сменить пароль</a></li>
+</ul>
 </ul>
 <?php
 }
 else{
     echo '<p>Вам нужно пройти <a href="register.php">регистрацию</a> или <a href="login.php">войти</a></p>';
 }
+

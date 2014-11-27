@@ -112,7 +112,19 @@ class User{
         return (!empty($this->data)) ? true : false;
     }
     
-   
+    public function hasPermissions($key){
+       $groups = $this->db->getU('groups',['id','=',$this->data()->group]);
+       foreach ($groups as $group)
+       if($group){
+          $permissions = json_decode($group->permissions,true);
+          
+          if($permissions[$key] == true){
+              return true;
+          }
+          
+       }
+       return false;
+    }
     
 }
 

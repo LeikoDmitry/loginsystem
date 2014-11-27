@@ -10,6 +10,47 @@ $user = new User();
 if(!$user->isLogin()){
     Redirect::to('index.php');
 }
+
+if(Input::exists()){
+    if(Token::check(Input::getItem('token'))){
+       $validate = new Validate();
+       $validation = $validate->check($_POST,[
+           'curentpassword' => [
+               'requered'=> true,
+               'min' => 4
+           ],
+           'newpassword' => [
+             'requered'=> true,
+              'min' => 4
+           ],
+           'newpassword2' => [
+              'requered'=> true,
+              'min' => 4,
+              'matches' => 'newpassword'
+           ]
+       ]);
+       
+       if($validate->passed()){
+           if(Hash::make(Input::getItem('curentpassword')) !== $user->data()->password){
+              echo "Не верный пароль!";
+           }
+           else{
+              
+              $user->update([
+                  'password'=> Hash::make(Input::getItem('newpassword'))
+              ]);
+              
+              Session::flash('home','Ваш пароль был изменен!');
+              Redirect::to('index.php');
+           }
+       }
+       else{
+           foreach ($validate->errors() as $err){
+               echo $err,'<br />';
+           }
+       }
+    }
+}
 ?>
 
 <form method="post">
